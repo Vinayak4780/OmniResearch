@@ -1,0 +1,11 @@
+.venv/
+node_modules/
+__pycache__/
+.pytest_cache/
+*.pyc
+/data/
+backend/data/
+frontend/dist/
+.env
+providers.json
+ml-install.log

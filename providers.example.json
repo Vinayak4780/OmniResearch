@@ -1,0 +1,41 @@
+{
+  "_comment": "Example declarative provider setup (OMNI_PROVIDERS_FILE). Providers whose id already exists are not modified; edit them in the UI afterwards. Model ids are examples — use ones your account can access.",
+  "providers": [
+    {
+      "id": "nim-planner",
+      "name": "NVIDIA NIM (planning)",
+      "adapter": "openai_compatible",
+      "config": {"base_url": "https://integrate.api.nvidia.com/v1", "chat_model": "meta/llama-3.3-70b-instruct", "supports_json_mode": true},
+      "secrets_env": {"api_key": "NVIDIA_API_KEY"}
+    },
+    {
+      "id": "openrouter-writer",
+      "name": "OpenRouter (synthesis)",
+      "adapter": "openai_compatible",
+      "config": {"base_url": "https://openrouter.ai/api/v1", "chat_model": "anthropic/claude-sonnet-4.5", "extra_headers": {"X-Title": "OmniResearch"}},
+      "secrets_env": {"api_key": "OPENROUTER_API_KEY"}
+    },
+    {
+      "id": "nim-rerank",
+      "name": "NVIDIA NIM reranker",
+      "adapter": "rerank_api",
+      "config": {"dialect": "nvidia_nim", "base_url": "https://ai.api.nvidia.com/v1/retrieval/nvidia/llama-3_2-nv-rerankqa-1b-v2", "path": "reranking", "model": "nvidia/llama-3.2-nv-rerankqa-1b-v2"},
+      "secrets_env": {"api_key": "NVIDIA_API_KEY"}
+    },
+    {
+      "id": "tavily",
+      "name": "Tavily",
+      "adapter": "tavily",
+      "config": {"search_depth": "basic"},
+      "secrets_env": {"api_key": "TAVILY_API_KEY"}
+    }
+  ],
+  "routes": {
+    "planning": ["nim-planner"],
+    "decomposition": ["nim-planner"],
+    "synthesis": ["openrouter-writer", "nim-planner"],
+    "verification": ["nim-planner"],
+    "reranking": ["nim-rerank", "local-cross-encoder", "local-lexical-rerank"],
+    "web_search": ["tavily"]
+  }
+}

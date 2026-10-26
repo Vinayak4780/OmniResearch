@@ -1,0 +1,57 @@
+# OmniResearch local deployment.
+#   cp .env.example .env    # set OMNI_ADMIN_TOKEN at minimum
+#   docker compose up -d --build
+#   open http://localhost:8000
+# Optional self-hosted metasearch:  docker compose --profile searxng up -d
+
+services:
+  omniresearch:
+    build:
+      context: .
+      args:
+        INSTALL_ML: ${INSTALL_ML:-true}
+    image: omniresearch:latest
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      OMNI_QDRANT_URL: http://qdrant:6333
+      OMNI_DATA_DIR: /data
+      # The browser reaches the API through the container's published port, which is not loopback
+      # inside the container, so admin endpoints require OMNI_ADMIN_TOKEN (set it in .env).
+    ports:
+      - "${OMNI_PORT:-8000}:8000"
+    volumes:
+      - omni-data:/data
+      - omni-models:/models
+      # To bootstrap providers declaratively: create providers.json (see providers.example.json),
+      # uncomment the next line and set OMNI_PROVIDERS_FILE=/config/providers.json in .env.
+      # - ./providers.json:/config/providers.json:ro
+    depends_on:
+      qdrant:
+        condition: service_started
+    restart: unless-stopped
+    stop_grace_period: 30s
+
+  qdrant:
+    image: qdrant/qdrant:v1.20.0
+    volumes:
+      - qdrant-data:/qdrant/storage
+    expose:
+      - "6333"
+    restart: unless-stopped
+
+  searxng:
+    profiles: ["searxng"]
+    # Pin to a specific tag from https://hub.docker.com/r/searxng/searxng/tags for reproducible deployments.
+    image: searxng/searxng:latest
+    volumes:
+      - ./deploy/searxng:/etc/searxng:rw
+    expose:
+      - "8080"
+    restart: unless-stopped
+
+volumes:
+  omni-data:
+  omni-models:
+  qdrant-data:

@@ -1,0 +1,11 @@
+# Minimal SearXNG settings for OmniResearch: JSON output must be enabled.
+use_default_settings: true
+server:
+  # Replace with a random value: python -c "import secrets; print(secrets.token_hex(32))"
+  secret_key: "change-me-to-a-random-value"
+  limiter: false
+  image_proxy: false
+search:
+  formats:
+    - html
+    - json

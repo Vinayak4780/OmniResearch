@@ -1,0 +1,10 @@
+# Heavy, optional local-ML dependencies. The application starts without them;
+# features that need them report themselves as unavailable until installed.
+#
+# Docling: primary document parser.
+docling>=2.15
+# PaddleOCR (PP-OCRv5 requires paddleocr>=3.0) on CPU.
+paddleocr>=3.0
+paddlepaddle>=3.0
+# CPU-local ONNX embeddings and cross-encoder reranking.
+fastembed>=0.4
